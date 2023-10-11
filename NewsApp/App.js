@@ -3,9 +3,9 @@ import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, Image, View, ScrollView, SafeAreaView, FlatList } from 'react-native';
 import { ListItem } from './components/ListItem';
 import axios from 'axios';
-import Constants from './Constants';
+import constants from './constants';
 
-const URL = `https://newsapi.org/v2/top-headlines?country=jp&category=business&apiKey=${Constants.constants.newsApiKey}`
+const URL = `https://newsapi.org/v2/top-headlines?country=jp&category=business&apiKey=${constants.constants.newsApiKey}`
 
 export default App = () => {
   const [articles, setArticles] = useState()
