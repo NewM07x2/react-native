@@ -1,60 +1,49 @@
-import { useState, useEffect, useReduce, useRef } from 'react';
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, Image, View, ScrollView, SafeAreaView, FlatList } from 'react-native';
-import { ListItem } from './components/ListItem';
-import axios from 'axios';
-import constants from './constants';
+import AppSetting from './constants/AppSetting';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 
-const URL = `https://newsapi.org/v2/top-headlines?country=jp&category=business&apiKey=${constants.constants.newsApiKey}`
+import Home from './components/Home'
+import Article from './components/Article'
+import Bookmark from './components/Bookmark'
+
+import { FontAwesome } from '@expo/vector-icons'
+
+const Stack = createNativeStackNavigator();
+const Tab = createBottomTabNavigator()
+
+const HomeStack = () => {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen name="Home" component={Home} options={{headerShown: false}}/>
+      <Stack.Screen name="Article" component={Article} options={{headerShown: true}}/>
+    </Stack.Navigator>
+  ) 
+}
+
+const screenOption = ({ route }) => ({
+  tabBarIcon: ({ color, size }) => {
+    if (route.name === 'HomeTab') {
+      return <FontAwesome name='home' size={size} color={color} />
+    } else if (route.name === 'BookmarkTab') {
+      return <FontAwesome name='bookmark' size={size} color={color} />
+    }
+  },
+  // アクティブなタブ
+  // tabBarActiveTintColor: 'tomato',
+  // 非アクティブなタブ
+  // tabBarInactiveTintColor: 'gray'
+})
+
 
 export default App = () => {
-  const [articles, setArticles] = useState()
-
-  const getInitArticles = async () => {
-    console.log('B')
-    try {
-      // API処理
-      const response = await axios.get(URL)
-      setArticles(response.data.articles)
-      return response.data.articles
-    } catch (error) {
-      console.log(error)
-    }
-  }
-
-  // 第二引数を[] とすることでコンポーネントの初期生成時に一度だけ処理する。
-  useEffect(() => {
-    getInitArticles()
-  }, [])
-
   return (
-    <View style={styles.container}>
-      <SafeAreaView>
-        <FlatList
-          data={articles}
-          renderItem={({ item }) => {
-            return (
-              <ListItem
-                imageUrl={item.urlToImage}
-                title={item.title}
-                author={item.author}
-              />
-            )
-          }}
-          keyExtractor={(item, index) => index.toString()}
-        />
-      </SafeAreaView>
-      <StatusBar style="auto" />
-    </View>
+    <NavigationContainer>
+      <Tab.Navigator screenOptions={screenOption}>
+        <Tab.Screen name='HomeTab' component={HomeStack} options={{headerShown: false, title: 'home'}}></Tab.Screen>
+        <Tab.Screen name='BookmarkTab' component={Bookmark} options={{headerShown: false, title: 'bookmark'}}></Tab.Screen>
+      </Tab.Navigator>
+    </NavigationContainer>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#eee',
-    // flexDirection: "column",
-    // alignItems: 'center',
-    // justifyContent: 'center',
-  }
-});
